@@ -8,6 +8,9 @@ const restartGameButton = document.querySelector("#restart-game");
 const gameOverEl = document.querySelector("#game-over");
 const finalScoreEl = document.querySelector("#final-score");
 const scoreFloatEl = document.querySelector("#score-float");
+const levelLabelEl = document.querySelector("#level-label");
+const levelDescriptionEl = document.querySelector("#level-description");
+const levelToggleButton = document.querySelector("#level-toggle");
 
 const state = {
   board: [],
@@ -18,6 +21,7 @@ const state = {
   clearing: false,
   clearingCells: new Set(),
   gameOver: false,
+  level: 2,
 };
 
 const BASE_SHAPES = [
@@ -93,6 +97,7 @@ function resetGame() {
   gameOverEl.hidden = true;
   scoreFloatEl.classList.remove("show");
   scoreFloatEl.textContent = "";
+  updateLevelText();
   messageEl.textContent = "Begin rustig. Kies eerst een klein blok.";
   render();
 }
@@ -301,8 +306,12 @@ async function placePiece(index, x, y) {
     state.clearing = false;
   }
 
-  state.pieces[index] = null;
-  if (state.pieces.every((pieceSlot) => pieceSlot === null)) {
+  if (state.level === 1) {
+    state.pieces[index] = nextFittingShape();
+  } else {
+    state.pieces[index] = null;
+  }
+  if (state.level === 2 && state.pieces.every((pieceSlot) => pieceSlot === null)) {
     dealNewPieces();
   }
   messageEl.textContent = cleared > 0 ? "Mooi. Een volle lijn is verdwenen." : "Goed geplaatst.";
@@ -312,6 +321,20 @@ async function placePiece(index, x, y) {
 
 function dealNewPieces() {
   state.pieces = [nextFittingShape(), nextFittingShape(), nextFittingShape()];
+}
+
+function switchLevel() {
+  state.level = state.level === 1 ? 2 : 1;
+  resetGame();
+}
+
+function updateLevelText() {
+  levelLabelEl.textContent = `Level ${state.level}`;
+  levelDescriptionEl.textContent = state.level === 1
+    ? "Elk geplaatst blok wordt meteen vervangen."
+    : "Speel eerst de drie blokken. Daarna verschijnen er drie nieuwe.";
+  levelToggleButton.textContent = state.level === 1 ? "Level 2" : "Level 1";
+  levelToggleButton.setAttribute("aria-label", `Schakel naar ${levelToggleButton.textContent}`);
 }
 
 function findFullLines() {
@@ -412,4 +435,5 @@ function checkGameOver() {
 
 newGameButton.addEventListener("click", resetGame);
 restartGameButton.addEventListener("click", resetGame);
+levelToggleButton.addEventListener("click", switchLevel);
 resetGame();

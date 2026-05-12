@@ -71,10 +71,31 @@ h1 {
   line-height: 1;
 }
 
+#level-label {
+  display: inline-block;
+  margin-left: 8px;
+  color: #7b5ea7;
+  font-size: 0.42em;
+  vertical-align: middle;
+}
+
 .topbar p {
   margin-top: 6px;
   color: var(--muted);
   font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+}
+
+.level-toggle {
+  min-width: 128px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #7b5ea7;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
 }
 
 .score-panel {
@@ -319,7 +340,8 @@ h1 {
 }
 
 #new-game:focus-visible,
-.piece-card:focus-visible {
+.piece-card:focus-visible,
+.level-toggle:focus-visible {
   outline: 4px solid #f2c96d;
   outline-offset: 3px;
 }
@@ -404,6 +426,10 @@ h1 {
     margin-bottom: 8px;
   }
 
+  .level-toggle {
+    min-width: 112px;
+  }
+
   .game-layout {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -465,6 +491,12 @@ h1 {
 
   .topbar p {
     font-size: 0.86rem;
+  }
+
+  .level-toggle {
+    min-width: 86px;
+    min-height: 42px;
+    padding: 0 10px;
   }
 
   .score-panel {
