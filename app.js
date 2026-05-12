@@ -17,9 +17,9 @@ const goalOverlayEl = document.querySelector("#goal-overlay");
 const goalMessageEl = document.querySelector("#goal-message");
 const goalNewGameButton = document.querySelector("#goal-new-game");
 
-const GOAL_BASE = 500;
+const GOAL_BASE = 250;
 const GOAL_STEP = 50;
-const GOAL_STORAGE_KEY = "blokkenpuzzel-level1-goal";
+const GOAL_STORAGE_KEY = "blokkenpuzzel-level1-goal-v2";
 
 const state = {
   board: [],
@@ -30,7 +30,7 @@ const state = {
   clearing: false,
   clearingCells: new Set(),
   gameOver: false,
-  level: 2,
+  level: 1,
   level1Target: GOAL_BASE,
   goalReached: false,
 };

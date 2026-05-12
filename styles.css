@@ -10,6 +10,8 @@
   --bad: #dc2626;
   --piece: #2f7f95;
   --piece-dark: #23697b;
+  --button: #9a3412;
+  --button-hover: #7c2d12;
   --shadow: 0 18px 40px rgba(43, 54, 65, 0.12);
   --cell-size: min(calc((100vw - 470px) / 10), calc((100dvh - 235px) / 10), 50px);
   --piece-cell-size: clamp(18px, calc(var(--cell-size) * 0.58), 28px);
@@ -91,11 +93,22 @@ h1 {
   padding: 0 18px;
   border: 0;
   border-radius: 8px;
-  background: #7b5ea7;
+  background: var(--button);
   color: white;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow);
+}
+
+.level-toggle[hidden] {
+  display: none;
+}
+
+.level-toggle:hover,
+#new-game:hover,
+#goal-new-game:hover,
+.game-over-panel button:hover {
+  background: var(--button-hover);
 }
 
 .score-panel {
@@ -120,7 +133,7 @@ h1 {
   margin-bottom: 8px;
   padding-bottom: 8px;
   border-bottom: 2px solid #eadfca;
-  color: var(--ink);
+  color: #dc2626;
   font-weight: 700;
 }
 
@@ -311,7 +324,7 @@ h1 {
   min-height: 58px;
   border: 0;
   border-radius: 8px;
-  background: #7b5ea7;
+  background: var(--button);
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -422,7 +435,7 @@ h1 {
   min-height: 46px;
   border: 0;
   border-radius: 8px;
-  background: #7b5ea7;
+  background: var(--button);
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -480,7 +493,7 @@ h1 {
   min-height: 52px;
   border: 0;
   border-radius: 8px;
-  background: #7b5ea7;
+  background: var(--button);
   color: white;
   font-weight: 700;
   cursor: pointer;
