@@ -251,6 +251,14 @@ h1 {
   cursor: default;
 }
 
+.piece-card.used {
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 700;
+  background: #ebe4d5;
+  border-style: dashed;
+}
+
 .piece-card.dragging-source {
   opacity: 0.35;
   outline: 4px solid rgba(47, 127, 149, 0.5);

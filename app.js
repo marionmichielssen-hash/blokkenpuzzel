@@ -85,7 +85,7 @@ function resetGame() {
   state.board = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
   state.score = 0;
   state.moves = 0;
-  state.pieces = [randomShape(), randomShape(), randomShape()];
+  dealNewPieces();
   state.dragging = null;
   state.clearing = false;
   state.clearingCells = new Set();
@@ -130,8 +130,14 @@ function renderPieces() {
     if (state.clearing || state.gameOver) card.classList.add("disabled");
     card.setAttribute("aria-label", `Blok ${index + 1}`);
     card.dataset.index = index;
-    card.append(createMiniGrid(piece));
-    card.addEventListener("pointerdown", startDrag);
+    if (piece) {
+      card.append(createMiniGrid(piece));
+      card.addEventListener("pointerdown", startDrag);
+    } else {
+      card.classList.add("used");
+      card.disabled = true;
+      card.textContent = "Geplaatst";
+    }
     piecesEl.append(card);
   });
 }
@@ -161,6 +167,7 @@ function startDrag(event) {
   event.preventDefault();
   const index = Number(event.currentTarget.dataset.index);
   const piece = state.pieces[index];
+  if (!piece) return;
   const ghost = createMiniGrid(piece, true);
   document.body.append(ghost);
   event.currentTarget.classList.add("dragging-source");
@@ -294,10 +301,17 @@ async function placePiece(index, x, y) {
     state.clearing = false;
   }
 
-  state.pieces[index] = nextFittingShape();
+  state.pieces[index] = null;
+  if (state.pieces.every((pieceSlot) => pieceSlot === null)) {
+    dealNewPieces();
+  }
   messageEl.textContent = cleared > 0 ? "Mooi. Een volle lijn is verdwenen." : "Goed geplaatst.";
   render();
   checkGameOver();
+}
+
+function dealNewPieces() {
+  state.pieces = [nextFittingShape(), nextFittingShape(), nextFittingShape()];
 }
 
 function findFullLines() {
@@ -380,9 +394,11 @@ function hasPlace(piece) {
 }
 
 function checkGameOver() {
-  const playable = state.pieces.some(hasPlace);
+  const activePieces = state.pieces.filter(Boolean);
+  const playable = activePieces.some(hasPlace);
   piecesEl.querySelectorAll(".piece-card").forEach((card, index) => {
-    card.classList.toggle("disabled", !hasPlace(state.pieces[index]));
+    const piece = state.pieces[index];
+    card.classList.toggle("disabled", !piece || !hasPlace(piece));
   });
 
   if (!playable) {
