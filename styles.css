@@ -116,6 +116,23 @@ h1 {
   font-size: 0.95rem;
 }
 
+.score-panel .target-row {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eadfca;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.score-panel .target-row[hidden] {
+  display: none;
+}
+
+.score-panel .target-row strong {
+  display: inline;
+  font-size: 1.15em;
+}
+
 .score-panel strong {
   display: block;
   font-size: 2rem;
@@ -233,6 +250,78 @@ h1 {
     opacity: 0;
     transform: translate(-50%, -50%) scale(1.35);
   }
+}
+
+.goal-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.goal-overlay[hidden] {
+  display: none;
+}
+
+.goal-message {
+  max-width: 92%;
+  color: #facc15;
+  font-size: clamp(2.6rem, 9vw, 6.5rem);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.15);
+  text-shadow:
+    0 4px 0 #d97706,
+    0 0 22px rgba(250, 204, 21, 0.9),
+    0 10px 28px rgba(0, 0, 0, 0.24);
+}
+
+.goal-message[hidden] {
+  display: none;
+}
+
+.goal-message.show {
+  animation: goal-celebrate 1600ms ease-out forwards;
+}
+
+@keyframes goal-celebrate {
+  0% {
+    opacity: 0;
+    transform: scale(0.15);
+  }
+  22% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+#goal-new-game {
+  min-width: 180px;
+  min-height: 58px;
+  border: 0;
+  border-radius: 8px;
+  background: #7b5ea7;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 16px 36px rgba(43, 54, 65, 0.22);
+}
+
+#goal-new-game:focus-visible {
+  outline: 4px solid #f2c96d;
+  outline-offset: 3px;
 }
 
 .tray {
@@ -506,6 +595,11 @@ h1 {
 
   .score-panel span {
     font-size: 0.78rem;
+  }
+
+  .score-panel .target-row {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
   }
 
   .score-panel strong {

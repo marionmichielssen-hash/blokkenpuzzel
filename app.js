@@ -11,6 +11,15 @@ const scoreFloatEl = document.querySelector("#score-float");
 const levelLabelEl = document.querySelector("#level-label");
 const levelDescriptionEl = document.querySelector("#level-description");
 const levelToggleButton = document.querySelector("#level-toggle");
+const targetRowEl = document.querySelector("#target-row");
+const targetScoreEl = document.querySelector("#target-score");
+const goalOverlayEl = document.querySelector("#goal-overlay");
+const goalMessageEl = document.querySelector("#goal-message");
+const goalNewGameButton = document.querySelector("#goal-new-game");
+
+const GOAL_BASE = 500;
+const GOAL_STEP = 50;
+const GOAL_STORAGE_KEY = "blokkenpuzzel-level1-goal";
 
 const state = {
   board: [],
@@ -22,6 +31,8 @@ const state = {
   clearingCells: new Set(),
   gameOver: false,
   level: 2,
+  level1Target: GOAL_BASE,
+  goalReached: false,
 };
 
 const BASE_SHAPES = [
@@ -86,6 +97,7 @@ function randomShape() {
 }
 
 function resetGame() {
+  state.level1Target = loadDailyGoal();
   state.board = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
   state.score = 0;
   state.moves = 0;
@@ -94,7 +106,11 @@ function resetGame() {
   state.clearing = false;
   state.clearingCells = new Set();
   state.gameOver = false;
+  state.goalReached = false;
   gameOverEl.hidden = true;
+  goalOverlayEl.hidden = true;
+  goalMessageEl.textContent = "";
+  goalNewGameButton.hidden = true;
   scoreFloatEl.classList.remove("show");
   scoreFloatEl.textContent = "";
   updateLevelText();
@@ -106,6 +122,8 @@ function render() {
   renderBoard();
   renderPieces();
   scoreEl.textContent = state.score;
+  targetScoreEl.textContent = state.level1Target;
+  targetRowEl.hidden = state.level !== 1;
 }
 
 function renderBoard() {
@@ -132,7 +150,7 @@ function renderPieces() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "piece-card";
-    if (state.clearing || state.gameOver) card.classList.add("disabled");
+    if (state.clearing || state.gameOver || state.goalReached) card.classList.add("disabled");
     card.setAttribute("aria-label", `Blok ${index + 1}`);
     card.dataset.index = index;
     if (piece) {
@@ -168,7 +186,7 @@ function createMiniGrid(piece, ghost = false) {
 }
 
 function startDrag(event) {
-  if (state.clearing || state.gameOver) return;
+  if (state.clearing || state.gameOver || state.goalReached) return;
   event.preventDefault();
   const index = Number(event.currentTarget.dataset.index);
   const piece = state.pieces[index];
@@ -306,6 +324,13 @@ async function placePiece(index, x, y) {
     state.clearing = false;
   }
 
+  if (state.level === 1 && state.score >= state.level1Target) {
+    renderBoard();
+    renderPieces();
+    await completeLevelOneGoal();
+    return;
+  }
+
   if (state.level === 1) {
     state.pieces[index] = nextFittingShape();
   } else {
@@ -335,6 +360,61 @@ function updateLevelText() {
     : "Speel eerst de drie blokken. Daarna verschijnen er drie nieuwe.";
   levelToggleButton.textContent = state.level === 1 ? "Level 2" : "Level 1";
   levelToggleButton.setAttribute("aria-label", `Schakel naar ${levelToggleButton.textContent}`);
+  targetRowEl.hidden = state.level !== 1;
+}
+
+function todayKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function loadDailyGoal() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GOAL_STORAGE_KEY));
+    if (saved?.date === todayKey() && Number.isFinite(saved.target)) {
+      return saved.target;
+    }
+  } catch {
+    // Start fresh if local storage contains older or invalid data.
+  }
+
+  saveDailyGoal(GOAL_BASE);
+  return GOAL_BASE;
+}
+
+function saveDailyGoal(target) {
+  try {
+    localStorage.setItem(GOAL_STORAGE_KEY, JSON.stringify({
+      date: todayKey(),
+      target,
+    }));
+  } catch {
+    // The game still works if storage is unavailable; the goal just resets on reload.
+  }
+}
+
+async function completeLevelOneGoal() {
+  state.goalReached = true;
+  messageEl.textContent = "Doelscore gehaald.";
+  goalNewGameButton.hidden = true;
+  goalOverlayEl.hidden = false;
+  goalMessageEl.hidden = false;
+  goalMessageEl.textContent = `${state.level1Target}! Proficiat!`;
+  goalMessageEl.classList.remove("show");
+  void goalMessageEl.offsetWidth;
+  goalMessageEl.classList.add("show");
+
+  await wait(1800);
+  const nextTarget = state.level1Target + GOAL_STEP;
+  state.level1Target = nextTarget;
+  saveDailyGoal(nextTarget);
+  targetScoreEl.textContent = state.level1Target;
+  goalMessageEl.hidden = true;
+  goalNewGameButton.hidden = false;
+  renderPieces();
 }
 
 function findFullLines() {
@@ -417,6 +497,7 @@ function hasPlace(piece) {
 }
 
 function checkGameOver() {
+  if (state.goalReached) return;
   const activePieces = state.pieces.filter(Boolean);
   const playable = activePieces.some(hasPlace);
   piecesEl.querySelectorAll(".piece-card").forEach((card, index) => {
@@ -436,4 +517,5 @@ function checkGameOver() {
 newGameButton.addEventListener("click", resetGame);
 restartGameButton.addEventListener("click", resetGame);
 levelToggleButton.addEventListener("click", switchLevel);
+goalNewGameButton.addEventListener("click", resetGame);
 resetGame();
