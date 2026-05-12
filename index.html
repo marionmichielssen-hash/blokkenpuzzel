@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Blokkenpuzzel</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app" aria-labelledby="title">
+      <section class="play-area">
+        <header class="topbar">
+          <div>
+            <h1 id="title">Blokkenpuzzel</h1>
+            <p>Sleep een blok naar het bord. Een volle lijn verdwijnt vanzelf.</p>
+          </div>
+        </header>
+
+        <div class="game-layout">
+          <aside class="score-panel" aria-live="polite">
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </aside>
+
+          <div class="board-wrap">
+            <div id="board" class="board" aria-label="Speelbord van 10 bij 10"></div>
+            <div id="score-float" class="score-float" aria-hidden="true"></div>
+          </div>
+
+          <aside class="tray" aria-label="Beschikbare blokken">
+            <h2>Kies een blok</h2>
+            <div id="pieces" class="pieces"></div>
+            <button id="new-game" type="button">Nieuw spel</button>
+          </aside>
+        </div>
+
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+      </section>
+
+      <section id="game-over" class="game-over" hidden aria-live="polite">
+        <div class="game-over-panel">
+          <h2>Geen zetten meer mogelijk</h2>
+          <p>Eindscore: <strong id="final-score">0</strong></p>
+          <button id="restart-game" type="button">Nieuw spel</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
